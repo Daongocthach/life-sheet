@@ -1,0 +1,74 @@
+{
+  "menu": {
+    "dashboard": "Bảng Điều Khiển",
+    "budget": "Phân Bổ Ngân Sách",
+    "transactions": "Nhật Ký Giao Dịch",
+    "food": "Thực đơn",
+    "workout": "Kế Hoạch Tập Luyện",
+    "settings": "Cài Đặt",
+    "export": "Xuất Excel"
+  },
+  "finance": {
+    "title": "Quản Lý Tài Chính",
+    "budget_allocation": "Phân Bổ Ngân Sách",
+    "transaction_logs": "Nhật Ký Giao Dịch",
+    "category": "Hạng mục",
+    "budget_limit": "Ngân sách",
+    "spent": "Đã chi",
+    "remaining": "Còn lại",
+    "date": "Ngày giờ",
+    "type": "Loại",
+    "amount": "Số tiền",
+    "notes": "Ghi chú",
+    "actions": "Thao tác",
+    "income": "Thu nhập",
+    "expense": "Chi tiêu",
+    "add_transaction": "Thêm giao dịch",
+    "edit_budget": "Sửa ngân sách",
+    "categories": {
+      "food": "Ăn uống sinh hoạt",
+      "gym": "Thể hình (Gym/Supps)",
+      "fixed": "Chi phí cố định",
+      "study": "Học tập/Công việc"
+    }
+  },
+  "food": {
+    "title": "Thực đơn",
+    "overview": "Thống Kê Tổng Quan",
+    "calories": "Tổng Calories",
+    "macros": "Bộ Ba Macros",
+    "cost_today": "Tổng chi phí hôm nay",
+    "cost_week": "Tổng chi phí tuần này",
+    "weekly_avg": "Trung bình ngày",
+    "meal": "Bữa ăn",
+    "food_name": "Tên thực phẩm",
+    "macros_nap": "Macros nạp",
+    "cal": "Calories",
+    "price": "Giá tiền",
+    "meals": {
+      "breakfast": "Bữa Sáng",
+      "lunch": "Bữa Trưa",
+      "dinner": "Bữa Tối",
+      "snack": "Bữa Phụ"
+    }
+  },
+  "workout": {
+    "title": "Kế Hoạch Tập Luyện",
+    "session_header": "Ngày tập & Giáo án",
+    "exercise": "Bài tập",
+    "set": "Hiệp",
+    "weight": "Khối lượng (kg)",
+    "reps": "Số lần (Reps)",
+    "status": "Trạng thái",
+    "done": "Done",
+    "timer_title": "Thời gian nghỉ",
+    "add_exercise": "Thêm bài tập",
+    "add_set": "Thêm hiệp"
+  },
+  "chatbot": {
+    "title": "Trợ Lý AI LifeSheet",
+    "placeholder": "Thử: 'Thêm chi tiêu 15k bữa sáng' hoặc 'Thêm chi tiêu 3 triệu gửi về nhà'...",
+    "send": "Gửi",
+    "welcome": "Xin chào! Tôi là Trợ lý AI LifeSheet. Bạn có thể nhập lệnh tự nhiên để cập nhật số liệu giao dịch, thực đơn hoặc tập luyện."
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "menu": {
+    "dashboard": "Dashboard",
+    "budget": "Budget Allocation",
+    "transactions": "Transaction Logs",
+    "food": "Meal Plan",
+    "workout": "Workout Plan",
+    "settings": "Settings",
+    "export": "Export Excel"
+  },
+  "finance": {
+    "title": "Finance Management",
+    "budget_allocation": "Budget Allocation",
+    "transaction_logs": "Transaction Logs",
+    "category": "Category",
+    "budget_limit": "Budget",
+    "spent": "Spent",
+    "remaining": "Remaining",
+    "date": "Date & Time",
+    "type": "Type",
+    "amount": "Amount",
+    "notes": "Notes",
+    "actions": "Actions",
+    "income": "Income",
+    "expense": "Expense",
+    "add_transaction": "Add Transaction",
+    "edit_budget": "Edit Budget",
+    "categories": {
+      "food": "Food & Living",
+      "gym": "Fitness (Gym/Supps)",
+      "fixed": "Fixed Expenses",
+      "study": "Study & Work"
+    }
+  },
+  "food": {
+    "title": "Meal Plan",
+    "overview": "Overview Stats",
+    "calories": "Total Calories",
+    "macros": "Macros",
+    "cost_today": "Today's Cost",
+    "cost_week": "Total Weekly Cost",
+    "weekly_avg": "Daily Average",
+    "meal": "Meal",
+    "food_name": "Food Item",
+    "macros_nap": "Macros",
+    "cal": "Calories",
+    "price": "Price",
+    "meals": {
+      "breakfast": "Breakfast",
+      "lunch": "Lunch",
+      "dinner": "Dinner",
+      "snack": "Snack"
+    }
+  },
+  "workout": {
+    "title": "Workout Plan",
+    "session_header": "Session & Routine",
+    "exercise": "Exercise",
+    "set": "Set",
+    "weight": "Weight (kg)",
+    "reps": "Reps",
+    "status": "Status",
+    "done": "Done",
+    "timer_title": "Rest Timer",
+    "add_exercise": "Add Exercise",
+    "add_set": "Add Set"
+  },
+  "chatbot": {
+    "title": "LifeSheet AI Assistant",
+    "placeholder": "Try: 'Thêm chi tiêu 15k bữa sáng' or 'set 4 cuốn tạ 15kg 12 reps'...",
+    "send": "Send",
+    "welcome": "Hello! I'm your LifeSheet AI Assistant. Speak to me in natural language to update your transactions, food entries, or workouts."
+  }
+}

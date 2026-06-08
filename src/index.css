@@ -1,0 +1,330 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --primary: #2563eb;          /* Royal Blue */
+  --primary-hover: #1d4ed8;
+  --primary-accent: #3b82f6;
+  --primary-light: #eff6ff;    /* Light blue for active item pills */
+  --background: #f8fafc;       /* Light grayish-blue */
+  --surface: #ffffff;          /* White cards */
+  --on-surface: #0f172a;
+  
+  --success: #10b981;
+  --success-light: rgba(16, 185, 129, 0.08);
+  --error: #ef4444;
+  --error-light: rgba(239, 68, 68, 0.08);
+  --amber: #f59e0b;
+  --amber-light: rgba(245, 158, 11, 0.08);
+  
+  --border: #e2e8f0;           /* Subtle border line */
+  --border-light: #f1f5f9;
+  --text-main: #1e293b;        /* Dark slate */
+  --text-muted: #64748b;       /* Cool gray */
+  
+  --slate-50: #f8fafc;
+  --slate-100: #f1f5f9;
+  --slate-200: #e2e8f0;
+  --slate-300: #cbd5e1;
+  --slate-400: #94a3b8;
+  --slate-500: #64748b;
+  --slate-800: #1e293b;
+  --slate-900: #0f172a;
+  --slate-950: #020617;
+  
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --rounded-lg: 16px;          /* Bo góc card lớn */
+  --rounded-md: 8px;           /* Bo góc button/input chuẩn 8px */
+  --rounded-full: 9999px;
+  
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--background);
+  color: var(--text-main);
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  display: flex;
+  min-height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+/* Scrollbar styles */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--slate-200);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--slate-300);
+}
+
+/* Flat white card */
+.glass-card {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: var(--rounded-lg);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease-in-out;
+}
+
+.glass-card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+/* Blue glow effect */
+.flash-highlight {
+  animation: flash-blue 1.5s ease-in-out forwards;
+}
+
+@keyframes flash-blue {
+  0% {
+    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4);
+    border-color: var(--primary);
+  }
+  70% {
+    box-shadow: 0 0 20px 10px rgba(37, 99, 235, 0);
+  }
+  100% {
+    box-shadow: none;
+  }
+}
+
+/* Modern Data Table */
+.modern-table-container {
+  overflow-x: auto;
+  width: 100%;
+  -webkit-overflow-scrolling: touch;
+}
+
+.modern-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+/* Prevent table column compression on mobile */
+.table-w-md {
+  min-width: 680px;
+}
+
+.table-w-lg {
+  min-width: 820px;
+}
+
+.modern-table th {
+  padding: 14px 16px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  background-color: var(--slate-50);
+  border-bottom: 1px solid var(--border);
+}
+
+.modern-table td {
+  padding: 16px;
+  font-size: 0.9rem;
+  color: var(--text-main);
+  border-bottom: 1px solid var(--border-light);
+  vertical-align: middle;
+}
+
+.modern-table tr {
+  transition: background-color 0.2s ease-in-out;
+}
+
+.modern-table tr:hover {
+  background-color: var(--slate-50);
+}
+
+/* Tabular numbers for financial metrics */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Badge component */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  font-weight: 550;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  gap: 4px;
+}
+
+.badge-income {
+  background-color: var(--success-light);
+  color: var(--success);
+  border-color: rgba(16, 185, 129, 0.15);
+}
+
+.badge-expense {
+  background-color: var(--error-light);
+  color: var(--error);
+  border-color: rgba(239, 68, 68, 0.15);
+}
+
+.badge-category {
+  background-color: var(--slate-50);
+  color: var(--slate-800);
+  border-color: var(--slate-200);
+}
+
+.badge-meal {
+  background-color: var(--primary-light);
+  color: var(--primary);
+  border-color: rgba(37, 99, 235, 0.15);
+}
+
+/* Form Controls */
+.form-input {
+  width: 100%;
+  padding: 10px 14px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  background-color: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: var(--rounded-md);
+  color: var(--text-main);
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.form-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* Button styles matching reference image exactly */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 20px;          /* Cân chỉnh padding giống ảnh dạng pill */
+  font-size: 0.875rem;        /* 14px */
+  font-weight: 550;           /* Medium clean weight */
+  font-family: inherit;
+  border-radius: 9999px;      /* Pill shape / capsule */
+  border: 1.5px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+  text-decoration: none;
+  gap: 8px;                   /* Khoảng cách hoàn hảo giữa icon & chữ */
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* Button solid màu xanh biển */
+.btn-primary {
+  background-color: var(--primary);
+  color: #ffffff !important;  /* Bắt buộc màu trắng */
+  border: 1.5px solid var(--primary);
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-hover);
+  border-color: var(--primary-hover);
+}
+
+.btn-primary svg {
+  stroke: #ffffff !important;
+  color: #ffffff !important;
+}
+
+/* Button outlined viền mảnh */
+.btn-secondary {
+  background-color: #ffffff;
+  color: var(--text-main);
+  border: 1.5px solid var(--slate-300);
+}
+
+.btn-secondary:hover {
+  background-color: var(--slate-50);
+  border-color: var(--slate-400);
+}
+
+/* Button danger outlined/light */
+.btn-danger {
+  background-color: #ffffff;
+  color: var(--error);
+  border: 1.5px solid var(--error);
+}
+
+.btn-danger:hover {
+  background-color: var(--error-light);
+}
+
+.btn-danger svg {
+  stroke: var(--error) !important;
+  color: var(--error) !important;
+}
+
+/* Icon button nhỏ */
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--rounded-md);
+  border: 1.5px solid var(--slate-300);
+  background: #ffffff;
+  color: var(--slate-400);
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.btn-icon:hover {
+  background-color: var(--slate-50);
+  color: var(--error);
+  border-color: var(--slate-400);
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  #root {
+    flex-direction: column;
+    overflow-y: auto;
+    height: 100vh;
+  }
+}
+
+/* Spin animation for refresh button */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.spin-animation {
+  animation: spin 0.8s linear infinite;
+}
