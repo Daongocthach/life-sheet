@@ -67,8 +67,12 @@
   },
   "chatbot": {
     "title": "Trợ Lý AI LifeSheet",
-    "placeholder": "Thử: 'Thêm chi tiêu 15k bữa sáng' hoặc 'Thêm chi tiêu 3 triệu gửi về nhà'...",
+    "placeholder": "Thử: 'Thêm chi tiêu bữa tối 15k nhận hàng 3k snack 3k' hoặc 'Set 4 cuốn tạ 15kg 12 reps'...",
     "send": "Gửi",
-    "welcome": "Xin chào! Tôi là Trợ lý AI LifeSheet. Bạn có thể nhập lệnh tự nhiên để cập nhật số liệu giao dịch, thực đơn hoặc tập luyện."
+    "welcome": "Xin chào! Tôi là Trợ lý AI LifeSheet. Bạn có thể nhập lệnh tự nhiên để cập nhật số liệu giao dịch, thực đơn hoặc tập luyện.",
+    "guide_title": "Cách nhập nhanh",
+    "guide_line_1": "Chi tiêu: hạng mục đứng trước số tiền, phần sau là note.",
+    "guide_line_2": "Ví dụ: Thêm chi tiêu bữa tối 15k nhận hàng 3k snack 3k.",
+    "guide_line_3": "Nếu muốn thêm bằng tool, cứ gõ tự nhiên theo mẫu: [chi tiêu/thu nhập] [hạng mục] [số tiền] [note]."
   }
 }

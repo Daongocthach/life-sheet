@@ -15,70 +15,44 @@ interface ChatbotAIProps {
   onClose: () => void;
 }
 
-const QUICK_SUGGESTIONS: Record<string, { label: string; icon: string; templates: string[] }> = {
-  budget: {
-    label: 'Ngân sách',
-    icon: '💰',
-    templates: [
-      'thêm ngân sách Ăn uống 5tr',
-      'thêm ngân sách Mua sắm 2tr',
-      'thêm ngân sách Du lịch 3tr',
-    ],
-  },
-  transaction: {
-    label: 'Giao dịch',
-    icon: '💸',
-    templates: [
-      'tiêu ăn trưa 45k',
-      'tiêu xăng xe 50k',
-      'thu nhập lương 10tr',
-    ],
-  },
-  food: {
-    label: 'Thực đơn',
-    icon: '🥗',
-    templates: [
-      'bữa sáng ăn 100g yến mạch',
-      'bữa trưa ăn 150g ức gà hết 30k',
-      'bữa tối ăn 200g cá hồi hết 90k',
-    ],
-  },
-  workout: {
-    label: 'Tập luyện',
-    icon: '🏋️‍♂️',
-    templates: [
-      'set 1 bài đẩy ngực 20kg 12 reps',
-      'set 2 bài squat 50kg 10 reps',
-      'set 3 bài tạ tay 10kg 15 reps',
-    ],
-  },
-};
-
 export const ChatbotAI: React.FC<ChatbotAIProps> = ({ isOpen, onClose }) => {
   const { t } = useTranslation();
   const [inputValue, setInputValue] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const [activeQuickTab, setActiveQuickTab] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-
-  const handleSelectTemplate = (val: string) => {
-    setInputValue(val);
-    setActiveQuickTab(null);
-    setTimeout(() => {
-      inputRef.current?.focus();
-    }, 50);
-  };
+  const [viewportHeight, setViewportHeight] = useState<number>(() =>
+    typeof window !== 'undefined' ? window.innerHeight : 0
+  );
 
   const { messages, isLoading, addMessage, setLoading, triggerHighlight } = useChatStore();
   const { addTransaction, budgets, addBudgetCategory, updateBudgetLimit } = useFinanceStore();
   const { addFoodEntry } = useFoodStore();
-  const { sessions, currentSessionId, addSession, addExercise, addSet, updateSet } = useWorkoutStore();
+  const { sessions, currentSessionId, addSession } = useWorkoutStore();
   const { selectedMonth } = useMonthStore();
 
   // Auto scroll to bottom when messages update
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isLoading]);
+
+  useEffect(() => {
+    const visualViewport = window.visualViewport;
+
+    const updateViewportHeight = () => {
+      setViewportHeight(visualViewport?.height ?? window.innerHeight);
+    };
+
+    updateViewportHeight();
+    visualViewport?.addEventListener('resize', updateViewportHeight);
+    visualViewport?.addEventListener('scroll', updateViewportHeight);
+    window.addEventListener('resize', updateViewportHeight);
+
+    return () => {
+      visualViewport?.removeEventListener('resize', updateViewportHeight);
+      visualViewport?.removeEventListener('scroll', updateViewportHeight);
+      window.removeEventListener('resize', updateViewportHeight);
+    };
+  }, []);
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -236,7 +210,8 @@ export const ChatbotAI: React.FC<ChatbotAIProps> = ({ isOpen, onClose }) => {
         backgroundColor: '#ffffff',
         display: 'flex',
         flexDirection: 'column',
-        height: '100vh',
+        height: viewportHeight ? `${viewportHeight}px` : '100dvh',
+        maxHeight: viewportHeight ? `${viewportHeight}px` : '100dvh',
         zIndex: 95,
         transition: 'transform 0.3s ease',
       }}
@@ -353,7 +328,7 @@ export const ChatbotAI: React.FC<ChatbotAIProps> = ({ isOpen, onClose }) => {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Quick Suggestions Panel */}
+      {/* Helper tips */}
       <div
         style={{
           borderTop: '1px solid var(--border-light)',
@@ -364,104 +339,31 @@ export const ChatbotAI: React.FC<ChatbotAIProps> = ({ isOpen, onClose }) => {
           gap: '8px',
         }}
       >
-        {/* Scrollable category tabs */}
         <div
           style={{
+            border: '1px solid var(--border-light)',
+            borderRadius: '14px',
+            backgroundColor: '#ffffff',
+            padding: '10px 12px',
             display: 'flex',
-            gap: '8px',
-            overflowX: 'auto',
-            paddingBottom: '4px',
-            scrollbarWidth: 'none',
-            msOverflowStyle: 'none',
+            flexDirection: 'column',
+            gap: '6px',
+            boxShadow: '0 1px 4px rgba(15, 23, 42, 0.04)',
           }}
-          className="no-scrollbar"
         >
-          {Object.entries(QUICK_SUGGESTIONS).map(([key, data]) => {
-            const isActive = activeQuickTab === key;
-            return (
-              <button
-                key={key}
-                type="button"
-                onClick={() => setActiveQuickTab(isActive ? null : key)}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  padding: '6px 12px',
-                  borderRadius: '9999px',
-                  fontSize: '0.8rem',
-                  fontWeight: 550,
-                  whiteSpace: 'nowrap',
-                  cursor: 'pointer',
-                  border: '1.5px solid',
-                  borderColor: isActive ? 'var(--primary)' : 'var(--slate-200)',
-                  backgroundColor: isActive ? 'var(--primary-light)' : '#ffffff',
-                  color: isActive ? 'var(--primary)' : 'var(--slate-700)',
-                  transition: 'all 0.2s ease',
-                  boxShadow: '0 1px 2px rgba(0,0,0,0.02)',
-                  outline: 'none',
-                }}
-              >
-                <span>{data.icon}</span>
-                <span>{data.label}</span>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Suggestion templates list */}
-        {activeQuickTab && (
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '6px',
-              animation: 'slideUp 0.2s ease-out',
-            }}
-          >
-            {QUICK_SUGGESTIONS[activeQuickTab].templates.map((tmpl, idx) => (
-              <button
-                key={idx}
-                type="button"
-                onClick={() => handleSelectTemplate(tmpl)}
-                className="template-button"
-                style={{
-                  textAlign: 'left',
-                  padding: '8px 12px',
-                  borderRadius: '8px',
-                  border: '1px dashed var(--slate-300)',
-                  backgroundColor: '#ffffff',
-                  fontSize: '0.825rem',
-                  fontFamily: 'var(--font-sans)',
-                  color: 'var(--slate-700)',
-                  cursor: 'pointer',
-                  transition: 'all 0.15s ease',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  gap: '8px',
-                  outline: 'none',
-                }}
-              >
-                <span style={{ flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {tmpl}
-                </span>
-                <span
-                  style={{
-                    fontSize: '0.7rem',
-                    color: 'var(--primary)',
-                    fontWeight: 600,
-                    backgroundColor: 'var(--primary-light)',
-                    padding: '2px 6px',
-                    borderRadius: '4px',
-                  }}
-                >
-                  Chọn
-                </span>
-              </button>
-            ))}
+          <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--slate-700)' }}>
+            {t('chatbot.guide_title')}
           </div>
-        )}
+          <div style={{ fontSize: '0.78rem', color: 'var(--slate-600)', lineHeight: 1.45 }}>
+            {t('chatbot.guide_line_1')}
+          </div>
+          <div style={{ fontSize: '0.78rem', color: 'var(--slate-600)', lineHeight: 1.45 }}>
+            {t('chatbot.guide_line_2')}
+          </div>
+          <div style={{ fontSize: '0.78rem', color: 'var(--slate-600)', lineHeight: 1.45 }}>
+            {t('chatbot.guide_line_3')}
+          </div>
+        </div>
       </div>
 
       {/* Input section */}
@@ -473,6 +375,7 @@ export const ChatbotAI: React.FC<ChatbotAIProps> = ({ isOpen, onClose }) => {
           display: 'flex',
           gap: '10px',
           backgroundColor: '#ffffff',
+          paddingBottom: 'calc(16px + env(safe-area-inset-bottom, 0px))',
         }}
       >
         <input
@@ -491,7 +394,12 @@ export const ChatbotAI: React.FC<ChatbotAIProps> = ({ isOpen, onClose }) => {
             outline: 'none',
             transition: 'border-color 0.2s',
           }}
-          onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
+          onFocus={(e) => {
+            e.target.style.borderColor = 'var(--primary)';
+            requestAnimationFrame(() => {
+              messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            });
+          }}
           onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
         />
         <button
@@ -526,6 +434,7 @@ export const ChatbotAI: React.FC<ChatbotAIProps> = ({ isOpen, onClose }) => {
             right: 0;
             width: 100vw !important;
             transform: translateX(100%);
+            border-left: none !important;
           }
           .chat-container.open {
             transform: translateX(0);
@@ -547,21 +456,6 @@ export const ChatbotAI: React.FC<ChatbotAIProps> = ({ isOpen, onClose }) => {
         .no-scrollbar {
           -ms-overflow-style: none;
           scrollbar-width: none;
-        }
-        @keyframes slideUp {
-          from {
-            opacity: 0;
-            transform: translateY(6px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        .template-button:hover {
-          border-color: var(--primary) !important;
-          background-color: var(--slate-50) !important;
-          transform: translateX(3px);
         }
       `}} />
     </aside>

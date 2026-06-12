@@ -67,8 +67,12 @@
   },
   "chatbot": {
     "title": "LifeSheet AI Assistant",
-    "placeholder": "Try: 'Thêm chi tiêu 15k bữa sáng' or 'set 4 cuốn tạ 15kg 12 reps'...",
+    "placeholder": "Try: 'Add expense dinner 15k delivery 3k snack 3k' or 'set 4 curls 15kg 12 reps'...",
     "send": "Send",
-    "welcome": "Hello! I'm your LifeSheet AI Assistant. Speak to me in natural language to update your transactions, food entries, or workouts."
+    "welcome": "Hello! I'm your LifeSheet AI Assistant. Speak to me in natural language to update your transactions, food entries, or workouts.",
+    "guide_title": "Quick input",
+    "guide_line_1": "For spending, put the category before the amount and the note after it.",
+    "guide_line_2": "Example: Add expense dinner 15k delivery 3k snack 3k.",
+    "guide_line_3": "To add via the tool, just type naturally in the format: [expense/income] [category] [amount] [note]."
   }
 }

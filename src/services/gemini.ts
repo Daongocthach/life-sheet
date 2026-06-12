@@ -11,98 +11,112 @@ export interface ParseResult {
 const parseLocalCommand = (text: string, activeCategories?: string[]): ParseResult | null => {
   const normalized = text.toLowerCase().trim();
 
+  const amountPatterns = [
+    /(\d+(?:\.\d+)?)\s*(triệu|tr)\b/i,
+    /(\d+)\s*m\s*(\d+)?\b/i,
+    /(\d+(?:\.\d+)?)\s*k\b/i,
+    /(\d+(?:\.\d+)?)\s*(nghìn|ngàn)\b/i,
+    /(\d{1,3}(?:\.\d{3})+)\b/,
+    /(\d+)\s*(?:đ|đồng|dong|vnd)?\b/i
+  ];
+
+  const findAmount = (sourceText: string) => {
+    for (const pattern of amountPatterns) {
+      const match = sourceText.match(pattern);
+      if (match && match.index !== undefined) {
+        const rawVal = match[1];
+        const amount = (() => {
+          if (pattern === amountPatterns[0]) {
+            return parseFloat(rawVal.replace(',', '.')) * 1000000;
+          }
+          if (pattern === amountPatterns[1]) {
+            const trieu = parseInt(rawVal) * 1000000;
+            const tram = match[2] ? parseInt(match[2].padEnd(3, '0')) * 1000 : 0;
+            return trieu + tram;
+          }
+          if (pattern === amountPatterns[2]) {
+            return parseFloat(rawVal.replace(',', '.')) * 1000;
+          }
+          if (pattern === amountPatterns[3]) {
+            return parseFloat(rawVal.replace(',', '.')) * 1000;
+          }
+          if (pattern === amountPatterns[4]) {
+            return parseInt(rawVal.replace(/\./g, ''));
+          }
+          return parseInt(rawVal);
+        })();
+
+        return {
+          amount,
+          matchStart: match.index,
+          matchEnd: match.index + match[0].length,
+        };
+      }
+    }
+
+    return null;
+  };
+
+  const cleanCommandPrefix = (input: string) => {
+    return input
+      .replace(/^\s*(thêm|tạo|ghi|nhập|log|đăng|add)\s+/gi, '')
+      .replace(/^\s*(chi tiêu|chi phí|tiêu|thu nhập|giao dịch|mua)\s+/gi, '')
+      .replace(/^\s*(là|cho|về|vào)\s+/gi, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+  };
+
+  const buildFinanceCategory = (beforeAmount: string, afterAmount: string) => {
+    const beforeClean = cleanCommandPrefix(beforeAmount);
+    const afterClean = cleanCommandPrefix(afterAmount);
+    const categorySeed = beforeClean || afterClean;
+
+    if (activeCategories && activeCategories.length > 0) {
+      const directBefore = activeCategories.find(cat => beforeClean.toLowerCase().includes(cat.toLowerCase()));
+      if (directBefore) return directBefore;
+
+      const directAfter = activeCategories.find(cat => afterClean.toLowerCase().includes(cat.toLowerCase()));
+      if (directAfter) return directAfter;
+
+      const smartBefore = matchCategorySmartly(beforeClean || afterClean, activeCategories);
+      if (smartBefore) return smartBefore;
+    }
+
+    const seed = categorySeed.toLowerCase();
+    if (seed.includes('ăn') || seed.includes('uống') || seed.includes('bữa') || seed.includes('chợ') || seed.includes('siêu thị')) {
+      return 'Ăn uống sinh hoạt';
+    }
+    if (seed.includes('gym') || seed.includes('tạ') || seed.includes('whey') || seed.includes('supp') || seed.includes('tập')) {
+      return 'Thể hình (Gym/Supps)';
+    }
+    if (seed.includes('điện') || seed.includes('nước') || seed.includes('nhà') || seed.includes('trọ') || seed.includes('wifi')) {
+      return 'Chi phí cố định';
+    }
+    if (seed.includes('học') || seed.includes('sách') || seed.includes('khóa học') || seed.includes('làm việc') || seed.includes('công việc')) {
+      return 'Học tập/Công việc';
+    }
+
+    return categorySeed || 'Ăn uống sinh hoạt';
+  };
+
   // 1. FINANCE: "thêm chi tiêu 15k bữa sáng" hoặc "chi tiêu 3 triệu gửi về nhà"
   if (normalized.includes('chi tiêu') || normalized.includes('tiêu') || normalized.includes('thu nhập') || normalized.includes('mua') || normalized.includes('giao dịch')) {
     const isExpense = !normalized.includes('thu nhập');
-    
-    // Tìm số tiền và vị trí của nó trong chuỗi gốc
-    const amountPatterns = [
-      /(\d+(?:\.\d+)?)\s*(triệu|tr)\b/i,
-      /(\d+)\s*m\s*(\d+)?\b/i,
-      /(\d+(?:\.\d+)?)\s*k\b/i,
-      /(\d+(?:\.\d+)?)\s*(nghìn|ngàn)\b/i,
-      /(\d{1,3}(?:\.\d{3})+)\b/,
-      /(\d+)\s*(?:đ|đồng|dong|vnd)?\b/i
-    ];
+    const amountInfo = findAmount(text);
+    const amount = amountInfo?.amount || 0;
+    const matchStart = amountInfo?.matchStart ?? -1;
+    const matchEnd = amountInfo?.matchEnd ?? -1;
 
-    let amount = 0;
-    let matchEnd = -1;
+    const textBeforeAmount = matchStart !== -1 ? text.substring(0, matchStart).trim() : text;
+    const textAfterAmount = matchEnd !== -1 ? text.substring(matchEnd).trim() : '';
 
-    for (const pattern of amountPatterns) {
-      const match = text.match(pattern); // Khớp trên chuỗi gốc để tính toán vị trí chính xác
-      if (match && match.index !== undefined) {
-        const rawVal = match[1];
-        matchEnd = match.index + match[0].length;
+    const category = buildFinanceCategory(textBeforeAmount, textAfterAmount);
 
-        if (pattern === amountPatterns[0]) {
-          amount = parseFloat(rawVal.replace(',', '.')) * 1000000;
-        } else if (pattern === amountPatterns[1]) {
-          const trieu = parseInt(rawVal) * 1000000;
-          const tram = match[2] ? parseInt(match[2].padEnd(3, '0')) * 1000 : 0;
-          amount = trieu + tram;
-        } else if (pattern === amountPatterns[2]) {
-          amount = parseFloat(rawVal.replace(',', '.')) * 1000;
-        } else if (pattern === amountPatterns[3]) {
-          amount = parseFloat(rawVal.replace(',', '.')) * 1000;
-        } else if (pattern === amountPatterns[4]) {
-          amount = parseInt(rawVal.replace(/\./g, ''));
-        } else {
-          amount = parseInt(rawVal);
-        }
-        break;
-      }
-    }
+    let note = textAfterAmount
+      .replace(/^\s*(cho|với|vì|do|là|của|cho khoản|do khoản)\s+/gi, '')
+      .replace(/\s+/g, ' ')
+      .trim();
 
-    // Lấy chuỗi mô tả nằm phía sau số tiền
-    let textAfterAmount: string;
-    if (matchEnd !== -1) {
-      textAfterAmount = text.substring(matchEnd).trim();
-    } else {
-      // Fallback nếu không định dạng được số tiền
-      const idx = text.toLowerCase().indexOf('tiêu');
-      if (idx !== -1) {
-        textAfterAmount = text.substring(idx + 4).trim();
-      } else {
-        textAfterAmount = text;
-      }
-    }
-
-    // Xác định hạng mục ngân sách dựa trên nội dung sau số tiền
-    let category = 'Ăn uống sinh hoạt';
-    if (activeCategories && activeCategories.length > 0) {
-      const normAfter = textAfterAmount.toLowerCase();
-      // Khớp trực tiếp nếu phần sau số tiền chứa tên ngân sách cụ thể
-      const matchedDirect = activeCategories.find(cat => normAfter.includes(cat.toLowerCase()));
-      if (matchedDirect) {
-        category = matchedDirect;
-      } else {
-        // So khớp thông minh (theo từ khóa tương tự hoặc độ tương đồng từ)
-        category = matchCategorySmartly(textAfterAmount, activeCategories);
-      }
-    } else {
-      // Từ khóa mặc định
-      const normAfter = textAfterAmount.toLowerCase();
-      if (normAfter.includes('whey') || normAfter.includes('gym') || normAfter.includes('supp') || normAfter.includes('tạ')) {
-        category = 'Thể hình (Gym/Supps)';
-      } else if (normAfter.includes('cố định') || normAfter.includes('điện') || normAfter.includes('nước') || normAfter.includes('nhà') || normAfter.includes('trọ')) {
-        category = 'Chi phí cố định';
-      } else if (normAfter.includes('học') || normAfter.includes('sách') || normAfter.includes('khóa học') || normAfter.includes('làm') || normAfter.includes('việc')) {
-        category = 'Học tập/Công việc';
-      }
-    }
-
-    // Tạo ghi chú (notes) sạch từ mô tả sau số tiền
-    let note = textAfterAmount;
-    if (activeCategories) {
-      activeCategories.forEach(cat => {
-        if (cat.length > 4) {
-          note = note.replace(new RegExp(cat, 'gi'), '').trim();
-        }
-      });
-    }
-
-    // Dọn dẹp khoảng trắng kép thừa
-    note = note.replace(/\s+/g, ' ').trim();
     if (!note) {
       note = isExpense ? 'Chi tiêu tự động' : 'Thu nhập tự động';
     }
