@@ -20,6 +20,7 @@ export const ChatbotAI: React.FC<ChatbotAIProps> = ({ isOpen, onClose }) => {
   const [inputValue, setInputValue] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const shouldRefocusInputRef = useRef(false);
   const [viewportHeight, setViewportHeight] = useState<number>(() =>
     typeof window !== 'undefined' ? window.innerHeight : 0
   );
@@ -34,6 +35,15 @@ export const ChatbotAI: React.FC<ChatbotAIProps> = ({ isOpen, onClose }) => {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isLoading]);
+
+  useEffect(() => {
+    if (isOpen && !isLoading && shouldRefocusInputRef.current) {
+      shouldRefocusInputRef.current = false;
+      requestAnimationFrame(() => {
+        inputRef.current?.focus();
+      });
+    }
+  }, [isOpen, isLoading]);
 
   useEffect(() => {
     const visualViewport = window.visualViewport;
@@ -60,6 +70,7 @@ export const ChatbotAI: React.FC<ChatbotAIProps> = ({ isOpen, onClose }) => {
 
     const userText = inputValue;
     setInputValue('');
+    shouldRefocusInputRef.current = true;
 
     // 1. Thêm tin nhắn của User vào store
     addMessage({ role: 'user', content: userText });

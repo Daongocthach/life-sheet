@@ -7,6 +7,54 @@ export interface ParseResult {
   reply: string;
 }
 
+const pad2 = (value: number) => String(value).padStart(2, '0');
+
+const parseVietnameseDate = (sourceText: string) => {
+  const datePattern = /(?:ngày\s*)?(\d{1,2})\s*\/\s*(\d{1,2})(?:\s*\/\s*(\d{2,4}))?/i;
+  const match = sourceText.match(datePattern);
+
+  if (!match || match.index === undefined) {
+    return null;
+  }
+
+  const day = parseInt(match[1], 10);
+  const month = parseInt(match[2], 10);
+  if (!day || !month || day < 1 || day > 31 || month < 1 || month > 12) {
+    return null;
+  }
+
+  const currentYear = new Date().getFullYear();
+  const rawYear = match[3] ? parseInt(match[3], 10) : currentYear;
+  const year = rawYear < 100 ? 2000 + rawYear : rawYear;
+  const localDate = new Date(year, month - 1, day, 12, 0, 0, 0);
+
+  if (
+    localDate.getFullYear() !== year ||
+    localDate.getMonth() !== month - 1 ||
+    localDate.getDate() !== day
+  ) {
+    return null;
+  }
+
+  return {
+    iso: localDate.toISOString(),
+    display: `${pad2(day)}/${pad2(month)}/${year}`,
+    start: match.index,
+    end: match.index + match[0].length,
+  };
+};
+
+const stripVietnameseDate = (sourceText: string, dateInfo: ReturnType<typeof parseVietnameseDate>) => {
+  if (!dateInfo) return sourceText;
+
+  return sourceText
+    .slice(0, dateInfo.start)
+    .concat(sourceText.slice(dateInfo.end))
+    .replace(/\b(?:ngày|date)\b/gi, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+};
+
 // Regex fallback parser for local testing
 const parseLocalCommand = (text: string, activeCategories?: string[]): ParseResult | null => {
   const normalized = text.toLowerCase().trim();
@@ -106,9 +154,11 @@ const parseLocalCommand = (text: string, activeCategories?: string[]): ParseResu
     const amount = amountInfo?.amount || 0;
     const matchStart = amountInfo?.matchStart ?? -1;
     const matchEnd = amountInfo?.matchEnd ?? -1;
+    const dateInfo = parseVietnameseDate(text);
 
     const textBeforeAmount = matchStart !== -1 ? text.substring(0, matchStart).trim() : text;
-    const textAfterAmount = matchEnd !== -1 ? text.substring(matchEnd).trim() : '';
+    const textAfterAmountRaw = matchEnd !== -1 ? text.substring(matchEnd).trim() : '';
+    const textAfterAmount = stripVietnameseDate(textAfterAmountRaw, dateInfo);
 
     const category = buildFinanceCategory(textBeforeAmount, textAfterAmount);
 
@@ -116,6 +166,10 @@ const parseLocalCommand = (text: string, activeCategories?: string[]): ParseResu
       .replace(/^\s*(cho|với|vì|do|là|của|cho khoản|do khoản)\s+/gi, '')
       .replace(/\s+/g, ' ')
       .trim();
+
+    if (!note) {
+      note = cleanCommandPrefix(textBeforeAmount);
+    }
 
     if (!note) {
       note = isExpense ? 'Chi tiêu tự động' : 'Thu nhập tự động';
@@ -129,9 +183,9 @@ const parseLocalCommand = (text: string, activeCategories?: string[]): ParseResu
         amount: amount || 50000,
         category,
         notes: note,
-        date: new Date().toISOString()
+        date: dateInfo?.iso || new Date().toISOString()
       },
-      reply: `Đã ghi nhận giao dịch thành công: **${isExpense ? 'Chi tiêu' : 'Thu nhập'}** cho **${note}** với số tiền **${new Intl.NumberFormat('vi-VN').format(amount || 50000)} đ** vào hạng mục *${category}*.`
+      reply: `Đã ghi nhận giao dịch thành công: **${isExpense ? 'Chi tiêu' : 'Thu nhập'}** cho **${note}** với số tiền **${new Intl.NumberFormat('vi-VN').format(amount || 50000)} đ**${dateInfo ? ` vào ngày **${dateInfo.display}**` : ''} vào hạng mục *${category}*.`
     };
   }
 
